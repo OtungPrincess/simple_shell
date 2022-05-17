@@ -26,7 +26,7 @@ echo "ls" | ./shell In non-interactive mode, the program will exit after finishi
 
 man_1_simple_shell
 
-This is the man page which contains all functions and descriptions of all the functions used in this Simple shell project. To access this page, Do:
+This is the man page which contains all functions and descriptions of all the functions used in this Simple shell project.
 
 AUTHORS
 
