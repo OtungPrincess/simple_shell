@@ -40,6 +40,3 @@ Features
 4. The command lines are made only of one word.No arguement will be passed to the programs.
 5. If an executable is not found the shell prints an error message and displays the prompt again.
 
-Credits
-
-All codes written by Otung Princess and Akinpelu Faith.
