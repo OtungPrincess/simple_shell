@@ -1,75 +1,74 @@
 #include "main.h"
 
 /**
- * accion - Verify if the command is success
- * @path: command to be executed
- * @arguments: arguments of the command
- * @process: number of process of the program
- * Return: The exit status
+ * clear_info - initializes info_t struct
+ * @info: struct address
  */
-int accion(char *path, char **arguments, int process)
+void clear_info(info_t *info)
+{
+	info->arg = NULL;
+	info->argv = NULL;
+	info->path = NULL;
+	info->argc = 0;
+}
+
+/**
+ * set_info - initializes info_t struct
+ * @info: struct address
+ * @av: argument vector
+ */
+void set_info(info_t *info, char **av)
 {
 	int i = 0;
 
-	i = fork_hijo(path, arguments, environ);
-	if (i == -1)
-		error_p(arguments, process);
-	return (i);
-}
-
-/**
- * error_p - Prints a error message for the command
- * @tokens: command input
- * @process: number of process of the program
- */
-void error_p(char **tokens, int process)
-{
-	char *num_p = NULL;
-	char buffer[1024];
-
-	num_p = _itoa(process, buffer, 10);
-	write(1, "./hsh", 5);
-	write(1, ": ", 2);
-	write(1, num_p, _strlen(num_p));
-	write(1, ": ", 2);
-	write(1, tokens[0], _strlen(tokens[0]));
-	write(1, ": ", 2);
-	perror("");
-}
-
-/**
- * fork_hijo - function that creates a child process
- * to execute the given command (camino).
- * @camino: full path of the command to execute.
- * @arguments: command options.
- * @environ: user environment.
- * Return: Success is 0.
- */
-int fork_hijo(char *camino, char **arguments, char **environ)
-{
-	pid_t hijo = 0;
-	int status = 0, end = 0;
-
-	hijo = fork();
-	if (hijo == -1)
+	info->fname = av[0];
+	if (info->arg)
 	{
-		free(camino);
-		return (1);
-	}
-	if (hijo == 0)
-	{
-		if (execve(camino, arguments, environ) == -1)
+		info->argv = strtow(info->arg, " \t");
+		if (!info->argv)
 		{
-			return (-1);
+
+			info->argv = malloc(sizeof(char *) * 2);
+			if (info->argv)
+			{
+				info->argv[0] = _strdup(info->arg);
+				info->argv[1] = NULL;
+			}
 		}
+		for (i = 0; info->argv && info->argv[i]; i++)
+			;
+		info->argc = i;
+
+		replace_alias(info);
+		replace_vars(info);
 	}
-	else
+}
+
+/**
+ * free_info - frees info_t struct fields
+ * @info: struct address
+ * @all: true if freeing all fields
+ */
+void free_info(info_t *info, int all)
+{
+	ffree(info->argv);
+	info->argv = NULL;
+	info->path = NULL;
+	if (all)
 	{
-		wait(&status);
-		if (WIFEXITED(status))
-			end = WEXITSTATUS(status);
-		free(arguments);
-		free(camino);
+		if (!info->cmd_buf)
+			free(info->arg);
+		if (info->env)
+			free_list(&(info->env));
+		if (info->history)
+			free_list(&(info->history));
+		if (info->alias)
+			free_list(&(info->alias));
+		ffree(info->environ);
+			info->environ = NULL;
+		bfree((void **)info->cmd_buf);
+		if (info->readfd > 2)
+			close(info->readfd);
+		_putchar(BUF_FLUSH);
 	}
-	return (end);
 }

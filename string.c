@@ -1,84 +1,75 @@
 #include "main.h"
-/**
- * _strncmp - compare a string with the number of bits
- * @path: first string
- * @match: second string
- * @n: number th bits to be compared
- * Return: return the path if find a match
- */
-char *_strncmp(char *path, char *match, size_t n)
-{
-	while (n && *path && (*path == *match))
-	{
-		++path;
-		++match;
-		--n;
-	}
-	if (n == 0)
-	{
-		return (path);
-	}
-	else
-	{
-		return (NULL);
-	}
-}
-/**
- * _strdup - returns a pointer to a newly allocated space
- * @s: string to be duplicated
- * Return: a pointer to new string
- */
-char *_strdup(char *s)
-{
-	int i;
-	char *dup;
-	int len;
 
-	if (s == NULL)
-	{
-		return (NULL);
-	}
-	len = _strlen(s);
-	dup = malloc((sizeof(char) * len) + 1);
-	if (dup == NULL)
-	{
-		return (NULL);
-	}
-	for (i = 0; s[i] != '\0'; i++)
-	{
-		dup[i] = s[i];
-	}
-	dup[i] = '\0';
-	return (dup);
-}
 /**
- * _strlen - function to get the lenght of a string
- * @s: string for be counted
- * Return: length of the string
+ * _strlen - returns the length of a string
+ * @s: the string whose length to check
+ *
+ * Return: integer length of string
  */
 int _strlen(char *s)
 {
-	if (!*s || !s)
-		return (0);
-	return (1 + _strlen(s + 1));
-}
-/**
- * _strcpy - a function that copies the string pointed to by src
- * @dest: copy to
- * @src: copy from
- * Return: string
- */
-char *_strcpy(char *dest, char *src)
-{
 	int i = 0;
-	int u = 0;
 
-	while (src[i] != '\0')
+	if (!s)
+		return (0);
+
+	while (*s++)
 		i++;
-	while (u <= i)
+	return (i);
+}
+
+/**
+ * _strcmp - performs lexicogarphic comparison of two strangs.
+ * @s1: the first strang
+ * @s2: the second strang
+ *
+ * Return: negative if s1 < s2, positive if s1 > s2, zero if s1 == s2
+ */
+int _strcmp(char *s1, char *s2)
+{
+	while (*s1 && *s2)
 	{
-		dest[u] = src[u];
-		u++;
+		if (*s1 != *s2)
+			return (*s1 - *s2);
+		s1++;
+		s2++;
 	}
-	return (dest);
+	if (*s1 == *s2)
+		return (0);
+	else
+		return (*s1 < *s2 ? -1 : 1);
+}
+
+/**
+ * starts_with - checks if needle starts with haystack
+ * @haystack: string to search
+ * @needle: the substring to find
+ *
+ * Return: address of next char of haystack or NULL
+ */
+char *starts_with(const char *haystack, const char *needle)
+{
+	while (*needle)
+		if (*needle++ != *haystack++)
+			return (NULL);
+	return ((char *)haystack);
+}
+
+/**
+ * _strcat - concatenates two strings
+ * @dest: the destination buffer
+ * @src: the source buffer
+ *
+ * Return: pointer to destination buffer
+ */
+char *_strcat(char *dest, char *src)
+{
+	char *ret = dest;
+
+	while (*dest)
+		dest++;
+	while (*src)
+		*dest++ = *src++;
+	*dest = *src;
+	return (ret);
 }

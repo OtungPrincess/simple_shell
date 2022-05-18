@@ -1,121 +1,97 @@
 #include "main.h"
 
 /**
- * searchb - Verify the Built-in
- * @token: command to be verified
- * @line: line input
- * @i: Exit status
- * @process: number of process
- * Return: 1 if is Built-in
- * 0 if is not
+ * _myexit - exits the shell
+ * @info: Structure containing potential arguments. Used to maintain
+ *          constant function prototype.
+ *  Return: exits with a given exit status
+ *         (0) if info.argv[0] != "exit"
  */
-int searchb(char **token, char *line, int i, int process)
+int _myexit(info_t *info)
 {
-	int (*f)() = 0, num = 0;
+	int exitcheck;
 
-	f = get_function(token[0]);
-	if (f != NULL)
+	if (info->argv[1])  /* If there is an exit arguement */
 	{
-		if (f() == 0)
+		exitcheck = _erratoi(info->argv[1]);
+		if (exitcheck == -1)
 		{
-			free(token);
+			info->status = 2;
+			print_error(info, "Illegal number: ");
+			_eputs(info->argv[1]);
+			_eputchar('\n');
+			return (1);
 		}
-		else if (f() == 1)
-		{
-			if (token[1] == NULL)
-			{
-				free(token);
-				free(line);
-				exit(i);
-			}
-			if (_isdigit(token[1]) == -1)
-			{
-				error_q(token, process);
-				free(token);
-				return (2);
-			}
-			else
-			{
-				num = _atoi(token[1]);
-				free(token);
-				free(line);
-				exit(num);
-			}
-		}
-		return (0);
+		info->err_num = _erratoi(info->argv[1]);
+		return (-2);
 	}
-	return (1);
+	info->err_num = -1;
+	return (-2);
 }
 
 /**
- * error_q - Prints a error message for the command
- * @tokens: command input
- * @process: number of process of the program
+ * _mycd - changes the current directory of the process
+ * @info: Structure containing potential arguments. Used to maintain
+ *          constant function prototype.
+ *  Return: Always 0
  */
-void error_q(char **tokens, int process)
+int _mycd(info_t *info)
 {
-	char *num_p = NULL;
-	char buffer[1024];
+	char *s, *dir, buffer[1024];
+	int chdir_ret;
 
-	num_p = _itoa(process, buffer, 10);
-	write(1, "./hsh", 5);
-	write(1, ": ", 2);
-	write(1, num_p, _strlen(num_p));
-	write(1, ": ", 2);
-	write(1, tokens[0], _strlen(tokens[0]));
-	write(1, ": ", 2);
-	write(1, "Illegal number: ", 16);
-	write(1, tokens[1], _strlen(tokens[1]));
-	write(1, "\n", 1);
-}
-
-
-/**
- * get_function - search the builtins
- * @str: string to be compared
- * Exit_shell - function for exit the shell
- * Return: success 0.
- */
-
-int (*get_function(char *str))()
-{
-	Built_in bin[] = {
-		{"env", environment},
-		{"exit", Exit_shell},
-		{NULL, NULL}};
-	int l = 0;
-
-	while (bin[l].comand != NULL)
+	s = getcwd(buffer, 1024);
+	if (!s)
+		_puts("TODO: >>getcwd failure emsg here<<\n");
+	if (!info->argv[1])
 	{
-		if ((_strcmp(str, bin[l].comand)) == 0)
-		{
-			return (bin[l].f);
-		}
-		l++;
+		dir = _getenv(info, "HOME=");
+		if (!dir)
+			chdir_ret = /* TODO: what should this be? */
+				chdir((dir = _getenv(info, "PWD=")) ? dir : "/");
+		else
+			chdir_ret = chdir(dir);
 	}
-	return (NULL);
-}
-/**
- * environment - prints the environ
- * Return: success 0.
- */
-int environment(void)
-{
-	int v = 0;
-
-	while (environ[v])
+	else if (_strcmp(info->argv[1], "-") == 0)
 	{
-		write(STDOUT_FILENO, environ[v], _strlen(environ[v]));
-		write(STDOUT_FILENO, "\n", 1);
-		v++;
+		if (!_getenv(info, "OLDPWD="))
+		{
+			_puts(s);
+			_putchar('\n');
+			return (1);
+		}
+		_puts(_getenv(info, "OLDPWD=")), _putchar('\n');
+		chdir_ret = /* TODO: what should this be? */
+			chdir((dir = _getenv(info, "OLDPWD=")) ? dir : "/");
+	}
+	else
+		chdir_ret = chdir(info->argv[1]);
+	if (chdir_ret == -1)
+	{
+		print_error(info, "can't cd to ");
+		_eputs(info->argv[1]), _eputchar('\n');
+	}
+	else
+	{
+		_setenv(info, "OLDPWD", _getenv(info, "PWD="));
+		_setenv(info, "PWD", getcwd(buffer, 1024));
 	}
 	return (0);
 }
+
 /**
- * Exit_shell - exit the shell
- * Return: success 1.
+ * _myhelp - changes the current directory of the process
+ * @info: Structure containing potential arguments. Used to maintain
+ *          constant function prototype.
+ *  Return: Always 0
  */
-int Exit_shell(void)
+int _myhelp(info_t *info)
 {
-	return (1);
+	char **arg_array;
+
+	arg_array = info->argv;
+	_puts("help call works. Function not yet implemented \n");
+	if (0)
+		_puts(*arg_array); /* temp att_unused workaround */
+	return (0);
 }

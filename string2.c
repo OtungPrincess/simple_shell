@@ -1,112 +1,87 @@
 #include "main.h"
+
 /**
- * _strcat - concatenates 2 strings
- * @dest: input value
- * @src: input value
- * Return: dest
+ * _strcpy - copies a string
+ * @dest: the destination
+ * @src: the source
+ *
+ * Return: pointer to destination
  */
-char *_strcat(char *dest, char *src)
+char *_strcpy(char *dest, char *src)
 {
 	int i = 0;
-	int u = 0;
-	int j;
 
-	while (dest[i] != '\0')
-		i++;
-	while (src[u] != '\0')
-		u++;
-	for (j = 0; j <= u; j++)
+	if (dest == src || src == 0)
+		return (dest);
+	while (src[i])
 	{
-		dest[i] = src[j];
+		dest[i] = src[i];
 		i++;
 	}
+	dest[i] = 0;
 	return (dest);
 }
+
 /**
- * _strcmp - compare string values
- * @s1: input value
- * @s2: input value
- * Return: s1[i] - s2[i]
+ * _strdup - duplicates a string
+ * @str: the string to duplicate
+ *
+ * Return: pointer to the duplicated string
  */
-int _strcmp(char *s1, char *s2)
+char *_strdup(const char *str)
+{
+	int length = 0;
+	char *ret;
+
+	if (str == NULL)
+		return (NULL);
+	while (*str++)
+		length++;
+	ret = malloc(sizeof(char) * (length + 1));
+	if (!ret)
+		return (NULL);
+	for (length++; length--;)
+		ret[length] = *--str;
+	return (ret);
+}
+
+/**
+ *_puts - prints an input string
+ *@str: the string to be printed
+ *
+ * Return: Nothing
+ */
+void _puts(char *str)
 {
 	int i = 0;
 
-	while (s1[i] != '\0' && s2[i] != '\0')
+	if (!str)
+		return;
+	while (str[i] != '\0')
 	{
-		if (s1[i] != s2[i])
-			return (s1[i] - s2[i]);
+		_putchar(str[i]);
 		i++;
 	}
-	return (0);
 }
 
 /**
- * _strrev - Function that reverse a string
- * @str: string to reverse
- * Return: reversed string
+ * _putchar - writes the character c to stdout
+ * @c: The character to print
+ *
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
  */
-char *_strrev(char *str)
+int _putchar(char c)
 {
-	int i;
-	int len = 0;
-	char c;
+	static int i;
+	static char buf[WRITE_BUF_SIZE];
 
-	if (!str)
-		return (NULL);
-	while (str[len] != '\0')
-		len++;
-	for (i = 0; i < (len / 2); i++)
+	if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
 	{
-		c = str[i];
-		str[i] = str[len - i - 1];
-		str[len - i - 1] = c;
+		write(1, buf, i);
+		i = 0;
 	}
-	return (str);
-}
-
-/**
- * _itoa - Function that converts any value from int to string
- * @i: Value entered type integer
- * @strout: Standar Out
- * @base: Base to convert values
- * Return: A value type char
- */
-char *_itoa(int i, char *strout, int base)
-{
-	char *str = strout;
-	int digit, sign = 0;
-
-	if (i < 0)
-	{
-		sign = 1;
-		i *= -1;
-	}
-	while (i)
-	{
-		digit = i % base;
-		*str = (digit > 9) ? ('A' + digit - 10) : '0' + digit;
-		i = i / base;
-		str++;
-	}
-	if (sign)
-		*str++ = '-';
-	*str = '\0';
-	_strrev(strout);
-	return (strout);
-}
-
-/**
- * _isdigit - Verify if c is a digit
- * @c: Character to be verified
- * Return: -1 if c is not a digit
- * 0 if is
- */
-int _isdigit(char *c)
-{
-	if (!c || !*c)
-		return (0);
-	if (!isdigit(*c))
-		return (-1);
-	return (_isdigit(c + 1));
+	if (c != BUF_FLUSH)
+		buf[i++] = c;
+	return (1);
 }

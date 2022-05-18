@@ -1,49 +1,74 @@
 #include "main.h"
-/**
- * tokener - separate the words
- * @str: the string to be separate
- * @delim: the word separator
- * Return: the words separated
- */
-char **tokener(char *str, char *delim)
-{
-	char **command = NULL;
-	int words = counter(str), i = 1;
 
-	command = malloc(sizeof(char *) * (words + 1));
-	if (!command)
-	{
-		perror("Error malloc");
-		return (NULL);
-	}
-	command[0] = strtok(str, delim);
-	if (command[0] == NULL)
-	{
-		free_tokens(command);
-		return (NULL);
-	}
-	while (i < (words + 1))
-	{
-		command[i] = strtok(NULL, delim);
-		i++;
-	}
-	return (command);
+/**
+ * interactive - returns true if shell is interactive mode
+ * @info: struct address
+ *
+ * Return: 1 if interactive mode, 0 otherwise
+ */
+int interactive(info_t *info)
+{
+	return (isatty(STDIN_FILENO) && info->readfd <= 2);
 }
 
+/**
+ * is_delim - checks if character is a delimeter
+ * @c: the char to check
+ * @delim: the delimeter string
+ * Return: 1 if true, 0 if false
+ */
+int is_delim(char c, char *delim)
+{
+	while (*delim)
+		if (*delim++ == c)
+			return (1);
+	return (0);
+}
 
 /**
- * free_tokens - function that frees the memory space of all the tokens
- * @token: double pointer to be freed.
+ *_isalpha - checks for alphabetic character
+ *@c: The character to input
+ *Return: 1 if c is alphabetic, 0 otherwise
  */
 
-void free_tokens(char **token)
+int _isalpha(int c)
 {
-	int index = 0;
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+		return (1);
+	else
+		return (0);
+}
 
-	while (token[index] != NULL)
+/**
+ *_atoi - converts a string to an integer
+ *@s: the string to be converted
+ *Return: 0 if no numbers in string, converted number otherwise
+ */
+
+int _atoi(char *s)
+{
+	int i, sign = 1, flag = 0, output;
+	unsigned int result = 0;
+
+	for (i = 0;  s[i] != '\0' && flag != 2; i++)
 	{
-		free(token[index]);
-		index++;
+		if (s[i] == '-')
+			sign *= -1;
+
+		if (s[i] >= '0' && s[i] <= '9')
+		{
+			flag = 1;
+			result *= 10;
+			result += (s[i] - '0');
+		}
+		else if (flag == 1)
+			flag = 2;
 	}
-	free(token);
+
+	if (sign == -1)
+		output = -result;
+	else
+		output = result;
+
+	return (output);
 }
